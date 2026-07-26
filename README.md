@@ -1,107 +1,151 @@
 # Expense Tracker with Budget Insights
 
-A modern, responsive expense tracker built with **React 19 + TypeScript**, **Vite**, **Firebase** (Auth + Firestore), **Tailwind CSS**, and **Chart.js**. Track income and expenses, visualize spending patterns, get automatic budget insights, and export reports as CSV or PDF.
+A modern, responsive personal finance tracker built with **React 19 + TypeScript**, **Vite**, **Firebase** (Authentication + Firestore), **Tailwind CSS**, and **Chart.js**. Track income and expenses in real time, visualize spending patterns, get automatic budget insights, and export your data as CSV or PDF.
+
+---
+
+## Screenshots
+
+> Add screenshots of the app here. Suggested shots: Login, Dashboard, Transactions list, Add Transaction modal, Reports page, and Profile page.
+
+| Dashboard | Transactions |
+|---|---|
+| ![Dashboard](./screenshots/dashboard.png) | ![Transactions](./screenshots/transactions.png) |
+
+| Add Transaction | Reports |
+|---|---|
+| ![Add Transaction](./screenshots/add-transaction.png) | ![Reports](./screenshots/reports.png) |
+
+| Login | Profile |
+|---|---|
+| ![Login](./screenshots/login.png) | ![Profile](./screenshots/profile.png) |
+
+| Firebase DB |
+|---|
+| ![Login](./screenshots/firebase.png) |
+
+*(Save your screenshots into a `screenshots/` folder in the project root using the filenames above, or update the paths/table to match your own images.)*
+
+---
 
 ## Features
 
-- **Authentication** — email/password login & registration, protected routes, persistent sessions
-- **Dashboard** — total balance, income, expenses, monthly summary chart, budget insights, recent transactions
-- **Transactions** — add / edit / delete, search & filter, realtime sync via Firestore
-- **Reports** — income vs. expense chart, category distribution pie charts, financial trend line chart, adjustable date range
-- **Budget Insights** — automatic detection of spending increases, overspending, and category concentration
-- **Export** — download transactions as CSV or PDF
-- **Responsive** — works on desktop, tablet, and mobile
+- **Authentication**: email/password login and registration, protected routes, persistent sessions, password reset
+- **Dashboard**: total balance, total income, total expenses, monthly income vs. expense chart, automatic budget insights, recent transactions
+- **Transactions**: add, edit, delete; search and filter by type; real-time sync via Firestore (`onSnapshot`)
+- **Reports**: income vs. expense chart, category distribution pie charts (income and expense), net balance trend line, adjustable date range (3 / 6 / 12 months)
+- **Budget Insights**: automatic detection of spending increases, overspending, and category concentration
+- **Export**: download transactions as CSV or PDF, from both the Transactions and Reports pages
+- **Profile**: update display name, view account email
+- **Currency & date formatting**: amounts shown in Indian Rupees (₹), dates shown as `dd/mm/yyyy`
+- **Dark mode**: theme toggle with persisted preference
+- **Responsive**: works on desktop, tablet, and mobile
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | React 19, TypeScript, Vite |
+| Styling | Tailwind CSS |
+| Charts | Chart.js + react-chartjs-2 |
+| Forms & validation | React Hook Form + Zod |
+| Backend / data | Firebase Authentication, Cloud Firestore |
+| Export | PapaParse (CSV), jsPDF + jsPDF-AutoTable (PDF) |
+| Icons | Lucide React |
+
+---
+
+## Project Structure
+
+```
+src/
+├── components/
+│   ├── charts/          # Chart.js wrapper components
+│   ├── layout/           # Navbar, Sidebar, DashboardLayout
+│   ├── transactions/      # TransactionForm, TransactionRow
+│   └── ui/               # Reusable UI primitives (Button, Input, Modal, etc.)
+├── context/              # Auth and Theme React contexts
+├── firebase/              # Firebase app/auth initialization
+├── hooks/                 # useAuth, useTransactions, useBudgetInsights
+├── pages/                 # Route-level pages (Dashboard, Transactions, Reports, ...)
+├── routes/                # ProtectedRoute wrapper
+├── services/               # Firestore data access, CSV/PDF export, user profile updates
+├── types/                  # Shared TypeScript types
+└── utils/                  # Formatters, category config, insights calculations
+```
+
+---
 
 ## Getting Started
 
 ### 1. Install dependencies
 
 ```bash
-pnpm install
-# or: npm install
+npm install
 ```
 
 ### 2. Configure Firebase
 
-Create a Firebase project at https://console.firebase.google.com, enable **Email/Password Authentication** and **Cloud Firestore**, then copy `.env.example` to `.env` and fill in your project's config:
+Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com), enable **Email/Password Authentication** and **Cloud Firestore**, then copy `.env.example` to `.env` and fill in your project's config:
 
 ```bash
 cp .env.example .env
 ```
 
-### 3. Deploy Firestore rules & indexes (optional but recommended)
+### 3. Deploy Firestore rules & indexes
+
+The app queries transactions by `userId` and orders them by `date`, which requires a composite Firestore index. Deploy the rules and index definitions already included in this repo:
 
 ```bash
+firebase login
 firebase deploy --only firestore:rules,firestore:indexes
 ```
 
 ### 4. Run the dev server
 
 ```bash
-pnpm dev
+npm run dev
 ```
 
-App will be available at `http://localhost:5173`.
+The app will be available at `http://localhost:5173`.
 
 ### 5. Build for production
 
 ```bash
-pnpm build
+npm run build
 ```
 
-## Project Structure
+### 6. Deploy
 
-```text
-expense-tracker/
-├── public/
-├── src/
-│   ├── assets/
-│   ├── components/
-│   │   ├── charts/         # IncomeExpenseChart, CategoryPieChart, MonthlyTrendChart
-│   │   ├── layout/         # Navbar, Sidebar, DashboardLayout
-│   │   ├── transactions/   # TransactionForm, TransactionRow
-│   │   └── ui/             # Button, Input, Select, Card, Modal, Spinner, EmptyState
-│   ├── context/            # AuthContext
-│   ├── firebase/           # config.ts, auth.ts
-│   ├── hooks/               # useAuth, useTransactions, useBudgetInsights
-│   ├── pages/               # Login, Register, Dashboard, Transactions, Reports, Profile, NotFound
-│   ├── routes/              # ProtectedRoute
-│   ├── services/            # transactionService, userService, exportService
-│   ├── types/                # shared TypeScript types
-│   ├── utils/                # categories, formatters, insights
-│   ├── App.tsx
-│   └── main.tsx
-├── firebase.json
-├── firestore.rules
-├── firestore.indexes.json
-├── package.json
-├── tailwind.config.js
-├── tsconfig.json
-└── vite.config.ts
+```bash
+firebase deploy --only hosting
 ```
+
+---
 
 ## Firestore Data Model
 
-**users/{uid}**
-```ts
-{ uid: string; name: string; email: string; }
-```
+**`transactions` collection** — one document per transaction:
 
-**transactions/{id}**
-```ts
-{
-  id: string;
-  userId: string;
-  title: string;
-  amount: number;
-  type: "income" | "expense";
-  category: string;
-  date: string;       // yyyy-MM-dd
-  notes?: string;
-  createdAt: number;
-}
-```
+| Field | Type | Description |
+|---|---|---|
+| `userId` | string | UID of the owning user |
+| `title` | string | Transaction description |
+| `amount` | number | Amount (always positive; sign implied by `type`) |
+| `type` | `'income' \| 'expense'` | Transaction type |
+| `category` | string | Category label |
+| `date` | string | ISO date (`yyyy-mm-dd`) |
+| `notes` | string (optional) | Free-text notes |
+| `createdAt` | number | Timestamp the record was created |
 
-## Tech Stack
+**`users` collection** — one document per user, keyed by UID, storing profile info such as display name.
 
-React 19 · TypeScript · Vite · React Router DOM · Tailwind CSS · Chart.js / react-chartjs-2 · Firebase Auth & Firestore · React Hook Form · Zod · date-fns · PapaParse · jsPDF
+Security rules restrict read/write access so users can only access their own data (`firestore.rules`).
+
+---
+
+## License
+
+This project is provided as-is for personal or educational use.
