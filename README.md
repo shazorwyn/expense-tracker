@@ -20,7 +20,7 @@ A modern, responsive personal finance tracker built with **React 19 + TypeScript
 
 | Firebase DB |
 |---|
-| ![Login](./screenshots/firebase.png) |
+| ![Firebase](./screenshots/firebase.png) |
 
 ---
 
