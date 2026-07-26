@@ -6,8 +6,6 @@ A modern, responsive personal finance tracker built with **React 19 + TypeScript
 
 ## Screenshots
 
-> Add screenshots of the app here. Suggested shots: Login, Dashboard, Transactions list, Add Transaction modal, Reports page, and Profile page.
-
 | Dashboard | Transactions |
 |---|---|
 | ![Dashboard](./screenshots/dashboard.png) | ![Transactions](./screenshots/transactions.png) |
@@ -23,8 +21,6 @@ A modern, responsive personal finance tracker built with **React 19 + TypeScript
 | Firebase DB |
 |---|
 | ![Login](./screenshots/firebase.png) |
-
-*(Save your screenshots into a `screenshots/` folder in the project root using the filenames above, or update the paths/table to match your own images.)*
 
 ---
 
